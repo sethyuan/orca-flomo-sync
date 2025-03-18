@@ -1,0 +1,10 @@
+.flomo-webview {
+  display: none;
+  width: 0;
+  height: 1px;
+}
+
+.flomo-button {
+  width: auto;
+  height: 18px;
+}
