@@ -34,6 +34,14 @@ export async function load(_name: string) {
       type: "string",
       defaultValue: "Flomo Note",
     },
+    afterDate: {
+      label: t("After date"),
+      description: t(
+        "Notes before this date won't be synced, even in full sync mode.",
+      ),
+      type: "date",
+      defaultValue: null,
+    },
   })
 
   orca.themes.injectCSSResource(`${pluginName}/dist/main.css`, pluginName)
@@ -45,9 +53,26 @@ export async function load(_name: string) {
         const settings = orca.state.plugins[pluginName].settings
         const inboxName = settings?.inboxName || "Flomo Inbox"
         const noteTag = settings?.noteTag || "Flomo Note"
-        const syncKey = fullSync
-          ? null
-          : await orca.plugins.getData(pluginName, "syncKey")
+        const afterDateValue = settings?.afterDate
+
+        // Convert the after date to timestamp in seconds if available
+        const afterDateTimestamp = afterDateValue
+          ? Math.floor(new Date(afterDateValue).getTime() / 1000)
+          : null
+
+        // If we have both syncKey and an after date, use the greater value
+        let effectiveSyncKey = null
+        if (!fullSync) {
+          const savedSyncKey = await orca.plugins.getData(pluginName, "syncKey")
+          if (savedSyncKey && afterDateTimestamp) {
+            effectiveSyncKey = Math.max(savedSyncKey, afterDateTimestamp)
+          } else {
+            effectiveSyncKey = savedSyncKey || afterDateTimestamp
+          }
+        } else if (afterDateTimestamp) {
+          // In full sync mode, still respect the after date if it exists
+          effectiveSyncKey = afterDateTimestamp
+        }
 
         orca.notify("info", t("Starting to sync, please wait..."))
 
@@ -75,7 +100,7 @@ export async function load(_name: string) {
             return
           }
 
-          const [fetchOK, notes] = await getNotes(syncKey)
+          const [fetchOK, notes] = await getNotes(effectiveSyncKey)
           if (!fetchOK) {
             console.error("Failed to open IndexedDB.")
             orca.notify("error", t("Failed to sync Flomo notes."))

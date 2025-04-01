@@ -4,6 +4,9 @@ const zhCN = {
     "收件箱描述文字，导入的笔记将放在该块下。",
   "Note tag": "笔记标签",
   "The tag applied to the imported notes.": "导入的笔记将使用该标签。",
+  "After date": "起始日期",
+  "Notes before this date won't be synced, even in full sync mode.":
+    "该日期之前的笔记将不会被同步，即使在全量同步模式下也是如此。",
   "Incremental sync": "增量同步",
   "Full sync": "全量同步",
   "Please log in to Flomo first.": "请先登录到Flomo。",
