@@ -324,7 +324,7 @@ function injectFunctions(): Promise<void> {
 async function isLoggedIn(): Promise<boolean> {
   const webview = document.getElementById(WebviewID) as any
   const ret = await webview.executeJavaScript(
-    `(() => {return document.querySelector(".el-container") != null})()`,
+    `(() => {return document.querySelector(".container") != null})()`,
   )
   return ret
 }
